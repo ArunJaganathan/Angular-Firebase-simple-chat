@@ -1,0 +1,402 @@
+<html ng-app="sampleApp">
+  <head>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+    <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/angularfire/1.2.0/angularfire.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
+
+
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <!-- Begin emoji-picker Stylesheets -->
+    <link href="lib/css/emoji.css" rel="stylesheet">
+
+
+    <script src="lib/js/config.js"></script>
+    <script src="lib/js/util.js"></script>
+    <script src="lib/js/jquery.emojiarea.js"></script>
+    <script src="lib/js/emoji-picker.js"></script>
+    <!-- End emoji-picker JavaScript -->
+
+    <script>
+      $(function() {
+        // Initializes and creates emoji set from sprite sheet
+        window.emojiPicker = new EmojiPicker({
+          emojiable_selector: '[data-emojiable=true]',
+          assetsPath: 'lib/img/',
+          popupButtonClasses: 'fa fa-smile-o'
+        });
+        // Finds all elements with `emojiable_selector` and converts them to rich emoji input fields
+        // You may want to delay this step if you have dynamically created input fields that appear later in the loading process
+        // It can be called as many times as necessary; previously converted input fields will not be converted again
+        window.emojiPicker.discover();
+      });
+    </script>
+    <style>
+.mytext{
+    border:0;padding:10px;background:whitesmoke;
+}
+.text{
+    width:100%;display:flex;flex-direction:column;
+}
+.text > p:first-of-type{
+    width:100%;margin-top:0;margin-bottom:auto;line-height: 13px;font-size: 12px;
+}
+.text > p:last-of-type{
+    width:100%;text-align:right;color:silver;margin-bottom:-7px;margin-top:auto;
+}
+.text-l{
+    float:left;padding-right:10px;
+}        
+.text-r{
+    float:right;padding-left:10px;
+}
+.avatar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:25%;
+    float:left;
+    padding-right:10px;
+}
+.macro{
+    margin-top:5px;width:85%;border-radius:5px;padding:5px;display:flex;
+    position: relative;
+}
+.msj-rta{
+    float:right;background:whitesmoke;
+    position: relative;
+}
+.msj{
+    float:left;background:white;
+}
+.frame{
+    background:#e0e0de;
+    height:450px;
+    overflow:hidden;
+    padding:0;
+}
+.frame > div:last-of-type{
+    position:absolute;bottom:0;width:100%;display:flex;
+}
+body > div > div > div:nth-child(2) > span{
+    background: whitesmoke;padding: 10px;font-size: 21px;border-radius: 50%;
+}
+body > div > div > div.msj-rta.macro{
+    margin:auto;margin-left:1%;
+}
+ul {
+    width:100%;
+    list-style-type: none;
+    padding:18px;
+    position:absolute;
+    bottom:47px;
+    display:flex;
+    flex-direction: column;
+    top:0;
+    overflow-y:scroll;
+}
+.msj:before{
+    width: 0;
+    height: 0;
+    content:"";
+    top:0px;
+    left:-10px;
+    position:absolute;
+    border-style: solid;
+    border-width: 0 13px 13px 0;
+    border-color: transparent #ffffff transparent transparent;            
+}
+.msj-rta:after{
+    width: 0;
+    height: 0;
+    content:"";
+    top:0px;
+    right: -10px;
+    position:absolute;
+    border-style: solid;
+    border-width: 13px 13px 0 0;
+    border-color: whitesmoke transparent transparent transparent;           
+}  
+input:focus{
+    outline: none;
+}        
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: #d4d4d4;
+}
+::-moz-placeholder { /* Firefox 19+ */
+    color: #d4d4d4;
+}
+:-ms-input-placeholder { /* IE 10+ */
+    color: #d4d4d4;
+}
+:-moz-placeholder { /* Firefox 18- */
+    color: #d4d4d4;
+} 
+.msg-wrp{
+    max-height: 320px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 18px;
+}
+.txt-wrp{
+    width: 75%;
+    word-wrap: break-word;
+    padding: 5px;
+} 
+.msj-rta .avatar{
+    padding-left: 10px;
+    padding-right: 0;
+    float: right;
+}
+.emoji-menu{ bottom: 100%; left: 0;  }
+.emoji-wysiwyg-editor{ overflow: hidden; height: 70px; min-height: 70px; max-height: 70px; }
+.form-control:focus{ border: none; -webkit-box-shadow:none; box-shadow:none; }
+.emoji-picker-icon.parent-has-scroll{ right: 10px; }
+.lead{ margin-bottom: 0; }
+#chat_box{ 
+    display: none; 
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    border-top-left-radius: 5px;
+}
+.chat-hd{
+    border-bottom: 1px solid #cccccc;
+    text-align: center;
+    padding: 10px;
+}
+</style>
+  </head>
+  <body ng-controller="SampleCtrl">    
+    <div class="col-sm-3 user_list">
+  <div ng-repeat="usr in activeUsers">
+  <p ng-click="selectUsr(usr)">{{usr.name}} - {{usr.id}} </p>
+  </div> 
+  {{name}}  
+    </div>
+    
+    
+    <img src="images/loader.gif" id="loader">
+  <div class="col-sm-3 frame" id="chat_box">
+    <div class="chat-hd">{{connect_users}} </div>
+    <div class="msg-wrp">
+      <div ng-repeat="message in messages">
+        <div ng-if="message.chat_id == u1 || message.chat_id  == u2">
+          <div ng-if="message.who_chat == uid" >  
+            <div class="msj macro">
+              <div class="avatar"><img class="img-circle" style="width:100%;"  ng-src="{{avatar1}}" /></div>
+              <div class="txt-wrp">{{message.text}} {{message.emojii}}</div>
+            </div>
+          </div>
+        </div>
+        <div ng-if="message.chat_id == u1 || message.chat_id  == u2">
+          <div ng-if="message.who_chat == selectedUserID">
+            <div class="msj-rta macro">
+              <div class="txt-wrp">{{message.text}} {{message.emojii}}</div>
+              <div class="avatar"><img class="img-circle" style="width:100%;" ng-src="{{avatar2}}" /></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="msj-rta macro">                        
+        <div class="text text-r" style="background:whitesmoke !important">
+          
+          <div class="text-left">
+            <p class="lead emoji-picker-container">
+              <input type="text" class="mytext form-control" ng-model="newmessage.text" placeholder="Type a message" data-emojiable="true" id="emj"/>
+              <!-- <input type="email" class="form-control" placeholder="Input field" data-emojiable="true" id="emj"> -->
+            </p>
+        </div>
+        </div> 
+
+      </div>
+      <div style="padding:10px;">
+        <span class="glyphicon glyphicon-share-alt"></span>
+      </div>                
+    </div>
+  </div>
+  </body>
+
+
+
+<script type="text/javascript">
+var app = angular.module("sampleApp", ["firebase"]);
+app.controller("SampleCtrl", function($scope, $firebaseArray, $interval) {
+
+
+/*################## DEFAULT VALUES ################################*/
+    $("#chat_box").hide();
+    $scope.uid          =   "14"; // login user id
+    $scope.user         =   'me'; //  me/you
+    $scope.name         =   'David'; // login user name
+    $scope.date_added   =   Date.now();
+    $scope.activeUsers  =   [{name : 'arun',id:11},{name : 'kiran',id:12},{name : 'Shyam',id:13},{name : 'David',id:14}];
+    $scope.avatar1      =   "https://lh6.googleusercontent.com/-lr2nyjhhjXw/AAAAAAAAAAI/AAAAAAAARmE/MdtfUmC0M4s/photo.jpg?sz=48";
+    $scope.avatar2      =   "https://a11.t26.net/taringa/avatares/9/1/2/F/7/8/Demon_King1/48x48_5C5.jpg";
+    $("#loader").hide();
+/*##################################################################*/
+
+
+$(function () {
+    
+});
+
+$scope.msgHistory            = []
+$scope.selectUsr = function(usr){
+  $("#loader").show();
+      resetChat();
+      if($scope.uid == usr.id){
+        alert('Not possible to proceed !');
+        $("#loader").hide();
+        return false;
+      }
+      $("#loader").show();
+      var refUsr              = new Firebase("https://chat-project-app.firebaseio.com/");
+      var usersRef            = refUsr.child("chatUsers");
+      $scope.selectedUserID   = usr.id;
+      $scope.selectedUserName = usr.name;
+      $scope.ccId             = $scope.uid+'_'+$scope.selectedUserID;
+      $scope.connect_users    = $scope.name + ' Connected with ' + $scope.selectedUserName
+      var selUsr              = {
+                                  uid     :   $scope.uid,
+                                  to_uid  :   $scope.selectedUserID,
+                                  chat_id :   $scope.ccId
+                                }
+      /**************************************************************/
+      var refChatUsr        = new Firebase("https://chat-project-app.firebaseio.com/chatUsers");
+      $scope.usrs           = $firebaseArray(refChatUsr);
+      $scope.u1             = $scope.uid+'_'+$scope.selectedUserID;
+      $scope.u2             = $scope.selectedUserID+'_'+$scope.uid;
+      
+      var a = 0;
+      $scope.usrs.$loaded().then(function(){
+        $("#loader").show();
+        angular.forEach($scope.usrs, function(entry) { 
+            cc          =   entry.uid;
+            u2          =   entry.to_uid;
+            chatPer1    =   cc+'_'+u2;
+           chatPer2     =   u2+'_'+cc;                
+          if( chatPer1 == selUsr.chat_id || chatPer2 ==  selUsr.chat_id){
+              a++; 
+              $("#loader").show();
+              console.log('Connection exists....Connection Established');
+              //$("#loader").hide();
+              $("#chat_box").show(); 
+              $("#loader").hide();
+              return 1                      
+          }else{
+                if(a !=1){
+                  a =0;                   
+                } 
+          }             
+        })
+        if(a==0){
+              usersRef.push().set(
+                  {
+                     uid       : $scope.uid,
+                     to_uid    : $scope.selectedUserID,
+                     chat_id   : $scope.ccId
+                  });
+              alert('success')
+              $("#chat_box").show();
+              $("#loader").hide();
+            }
+
+      });
+      var refMsg            = new Firebase("https://chat-project-app.firebaseio.com/messages");
+      $scope.messages       = $firebaseArray(refMsg);
+      $("#loader").show();
+      if($scope.messages){
+        var wtf     = $('.msg-wrp');
+        var height  = wtf[0].scrollHeight;
+        wtf.scrollTop(height);   
+      }  
+    }
+
+    /* To insert chat-users*/
+    $scope.insertFireChat = function(message){
+      $scope.newmessage ='';
+      var refMsg    = new Firebase("https://chat-project-app.firebaseio.com/messages");
+      var date      = new Date();
+      var today     = date.toDateString();
+      var time      = date.toLocaleTimeString();     
+      refMsg.push().set({
+           from_name  :   $scope.name,
+           to_name    :   $scope.selectedUserName,
+           text       :   message,
+           date_added :   today,
+           time_added :   time,
+           chat_id    :   $scope.ccId,
+           who_chat   :   $scope.uid,
+           other_usr  :   $scope.selectedUserID
+      });
+
+    };
+
+
+
+    
+    
+    $scope.formatAMPM = function(date){ 
+      var hours   = date.getHours();
+      var minutes = date.getMinutes();
+      var ampm    = hours >= 12 ? 'PM' : 'AM';
+      hours       = hours % 12;
+      hours       = hours ? hours : 12; // the hour '0' should be '12'
+      minutes     = minutes < 10 ? '0'+minutes : minutes;
+      var strTime = hours + ':' + minutes + ' ' + ampm;
+      return strTime;
+    }            
+
+    //-- No use time. It is a javaScript effect.
+    $(".mytext").on("keydown", function(e){
+      $("#mytext").val(''); 
+      if (e.which == 13){
+        var text = $(this).val();
+        if (text !== ""){
+          insert_Chat('me', text,'','insert'); 
+          $(this).val('');
+        }
+      }
+    });
+
+    function insert_Chat(who, text, time,type){
+      $("#mytext").val(''); 
+    if(type == 'insert'){
+      $(".emoji-wysiwyg-editor").text('');
+        $scope.insertFireChat(text);
+      }
+    }
+
+    function resetChat(){
+      $("ul").empty();
+    }
+
+    $(".mytext").on("keydown", function(e){
+      $("#mytext").val(''); 
+      if (e.which == 13){
+        var text = $(this).val();
+        if (text !== ""){
+          insert_Chat('me', text,'','insert');              
+          $(this).val('');
+        }
+      }
+    });
+
+    $('body > div > div > div:nth-child(2) > span').click(function(){     
+      $(".mytext").trigger({type: 'keydown', which: 13, keyCode: 13});
+    })
+
+    
+
+    //-- Clear Chat
+    resetChat();  
+});
+  </script>
+</html>
